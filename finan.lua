@@ -1,14 +1,15 @@
 -- ********************************************************************* 
 -- *                                                                   * 
--- *                                          Copyright (c) 2017-2021  * 
+-- *                                          Copyright (c) 2017-2022  * 
 -- *                  Advanced Financial Mathematics for Language Lua  * 
 -- *                                                                   * 
--- * Project ..........: finan.lua                                     * 
--- * Author ...........: Jose Augusto N. G. Manzano                    * 
--- * Also Known As ....: Augusto Manzano                               * 
--- * Build Date  ......: 2017, May                                     * 
--- * Update  ..........: 2021, Apr                                     * 
--- * Version  .........: 2.0 - beta                                    * 
+-- * Project ..................: finan.lua                             * 
+-- * Author ...................: Jose Augusto N. G. Manzano            * 
+-- * Also Known As ............: Augusto Manzano                       * 
+-- * Build Date  ..............: 2017, May.                            * 
+-- * Update  ..................: 2022, Sept.                           * 
+-- * Version  .................: 4.0 - beta                            * 
+-- * Lua interpreter version  .: 5.4                                   * 
 -- *                                                                   * 
 -- * For public domain without any warranty.                           * 
 -- *                                                                   * 
@@ -123,6 +124,13 @@
 
    function ci(i, nc, pv, n)
      return pv * pow((1 + (i / nc)), nc * n)
+   end
+
+-- Function: compinter
+-- Target: Compound interest calculation.
+
+   function compinter(pv, i, n)
+     return pv * pow((1 + i), n) - pv
    end
 
 -- Function: cpcdisc
@@ -434,24 +442,43 @@
      return pv * pow(1 + (i / n), days)
    end
 
+-- Function: paybdisr()
+-- Target: Calculate the discounted payback.  
+
+   function paybdis(range, length)
+     balance = {}
+     years = 0.0
+     if n == 1 then
+       return 0 / 0 -- return value = nan
+     else
+       balance[1] = range[1]
+       x = 2
+       while x <= length and balance[x - 1] < 0 do
+         balance[x] = balance[x-1] + range[x]
+         years = years + 1    
+         x = x + 1
+      end
+    end
+    return years - 1 + abs(balance[x-2]) / range[x-1]
+  end
+
+
 -- Function: paybper()
 -- Target: Calculate the payback period. 
 
-   function paybper(n, range, length)
-     cashflow = range[1]
-     years = 1
-     if (n == 0) then 
-       return abs(range[1]) / range[2]
-     end
-     for x = 2, length - 1 do
-       cashflow = cashflow + range[x]
-       if (cashflow > 0) then
-         years = years + (cashflow - range[x]) / range[x]
-         return years
-       else 
-         years = years + 1
+   function paybper(range, length)
+     years = 0
+     if length == 1 then
+       return 0 / 0 -- return value = nan
+     else
+       for x = 2, length - 1 do
+         if range[x] ~= range[x + 1] then
+           return years
+         end
        end
      end
+     years = abs(range[1]) / range[2]
+     return years            
    end
 
 -- Function: percent2rate
@@ -497,8 +524,9 @@
      return cpmtc
    end
 
--- Function: pmtcan
--- Target: Calc. the montly loan payments according to USA.
+-- Function: pmtusa
+-- Target: Calc. the montly loan payments according to]
+--         United States of American mortgage convencios.
 
    function pmtusa(pv, i, n)
      if (n == 0) then
@@ -601,6 +629,13 @@
 
    function sightval(pmt, i, n)
      return pmt / finratio(i, n)
+   end
+
+-- Function: simpinter()
+-- Target: Simple interest calculation.
+
+   function simpinter(pv, i, n)
+     return pv * i * n
    end
 
 -- Function: sln
